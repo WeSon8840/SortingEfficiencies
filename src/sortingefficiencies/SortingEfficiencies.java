@@ -33,6 +33,7 @@ public class SortingEfficiencies {
         int nums4[] = new int[arraySize];
         int nums5[] = new int[arraySize];
         int nums6[] = new int[arraySize];
+        int nums7[] = new int[arraySize];
 
         int n;
         for (int i = 0; i < arraySize; i++) {
@@ -43,6 +44,7 @@ public class SortingEfficiencies {
             nums4[i] = n;
             nums5[i] = n;
             nums6[i] = n;
+            nums7[i] = n;
         }
 
         //Display the unsorted list
@@ -140,6 +142,23 @@ public class SortingEfficiencies {
         System.out.println("Performing Merge Sort");
         time = System.currentTimeMillis();
         Mergesort(nums6, 0, nums6.length - 1);
+        time = System.currentTimeMillis() - time;
+
+
+        System.out.println("Processing Time: " + time + "ms");
+        System.out.println("loopCounter = " + loopCounter);
+        System.out.println("comparisonCounter = " + comparisonCounter);
+        System.out.println("shiftCounter = " + shiftCounter);
+        System.out.println("\n------------------------------------");
+        
+        loopCounter = 0;
+        comparisonCounter = 0;
+        shiftCounter = 0;
+
+        //Radix Sort
+        System.out.println("Performing Radix Sort");
+        time = System.currentTimeMillis();
+        radixSort(nums7);
         time = System.currentTimeMillis() - time;
 
 
@@ -281,8 +300,7 @@ public class SortingEfficiencies {
        // To heapify a subtree rooted with node i which is 
        // an index in arr[]. n is size of heap 
     public static void heapify(int arr[], int n, int i) {
-            
-        loopCounter++;
+
         comparisonCounter++;
          
         //actually the index 
@@ -314,8 +332,7 @@ public class SortingEfficiencies {
         } 
     }
         
-    	public static void merge(int arr[], int l, int m, int r) 
-	{ 
+    public static void merge(int arr[], int l, int m, int r) { 
 		// Find sizes of two subarrays to be merged 
 		int array1 = m - l + 1; 
 		int array2 = r - m; 
@@ -377,10 +394,8 @@ public class SortingEfficiencies {
 
 	// Main function that sorts arr[l..r] using 
 	// merge() 
-	public static void Mergesort(int arr[], int l, int r){ 
-            
-
-            
+    public static void Mergesort(int arr[], int l, int r){ 
+                       
 	    if (l < r) { 
 	        // Find the middle point 
 		int m = (l+r)/2; 
@@ -395,6 +410,57 @@ public class SortingEfficiencies {
                 
 	    } 
 	} 
-
+    
+    public static void radixSort(int[] array)  {
+        int largestValue = getLargestValue(array);
+        
+        for (int exponent = 1; largestValue / exponent > 0; exponent *= 10)
+        {
+            loopCounter++;
+            int[] sortedArray = new int[array.length], numberCount = new int[10];
+            
+            //Gets number of digits with the same value (number of 0's, 1's, ...)
+            for (int i = 0; i < array.length; i++){
+                comparisonCounter++;
+                numberCount[getDigit(array[i], exponent)]++;
+            }
+                
+            
+            //Get's real position of numbers in sortedArray 
+            for (int i = 1; i < 10; i++)
+                numberCount[i] += numberCount[i - 1];
+            
+            //Writes to sortedArray (in reverse order because position in numberOfNumbers is the furthest position of that digit
+            for(int i = array.length - 1; i >= 0; i--)
+            {
+                sortedArray[numberCount[getDigit(array[i], exponent)] - 1] = array[i];
+                numberCount[getDigit(array[i], exponent)]--;
+            }
+            
+            //Updates array with sorted digits
+            for (int i = 0; i < array.length; i++)
+                array[i] = sortedArray[i];
+        }
+    }
+    
+    public static int getDigit(int number, int digitNumber)
+    {
+        return (int) (number / digitNumber) % 10;
+    }
+    
+    public static int getLargestValue(int[] array)
+    {
+        int largestValue = 0;
+        for (int element : array)
+        {
+            largestValue = element > largestValue ? element : largestValue;
+        }
+        return largestValue;
+    }
+    
+    public static int random(int min, int max)
+    {
+        return (int)(Math.random() * (max + 1) + min);
+    }
 }
 
